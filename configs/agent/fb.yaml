@@ -1,24 +1,41 @@
-agent_name: fb
+# Vanilla FB (Touati & Ollivier, 2021) for discrete actions. Hyperparameters: Table 5; the loss and networks follow
+# Meta's reference implementation (metamotivo/fb).
+name: fb
+use_context: false
+z_sampling: uniform     # uniform | vmf
+obs_encoding: onehot    # onehot (row / column one-hot) | xy (normalised coordinates)
+z_dim: 100
+h_dim: 100
+kappa: null             # concentration of the vMF task prior z ~ vMF(h, kappa) (z_sampling: vmf)
+standardize_h: true     # standardise the belief with training statistics and project it to the sphere
+oracle_context: false   # Oracle-ID: h = one-hot training-layout index instead of f_dyn
+cone_kappa: null        # RFB cone embedding: policy codes live in a cap around h of width set by kappa (null = off)
+cone_drop_h: false      # with cone embedding: do not also feed h to F (context enters only through the cone)
+geodesic_kappa: null    # RFB geodesic rotation of h towards other contexts' beliefs (null = off)
+belief_kappa: null      # RFB belief rotation: h ~ vMF(h, belief_kappa) during FB training (null = off)
+z_mix_ratio: 0.5        # fraction of z sampled from the prior; the rest is z = B(s)
+f_hidden_dims: [1024, 1024]
+f_preprocessor_dims: [1024]  # separate s / (s, [h; z]) embeddings (Appendix E.1.2); [] = plain MLP on [s, h, z]
+f_embed_dim: 512
+b_hidden_dims: [256, 256, 256]
+lr: 3e-4                # Table 5: 1e-4 (3e-4 is clearly better here, see README)
+discount: 0.95          # Table 5: 0.99; 0.95 makes greedy goal-reaching policies much more accurate here
+tau: 0.01               # target network Polyak rate
+fb_loss: original       # original: Eq. (13) as in metamotivo | lsif: (1 - discount)-weighted diagonal (onestep-fb)
+target_agg: mean        # aggregation of the 2 target F networks: mean | min
+normalize_b: true       # B(s) projected to the sphere of radius sqrt(d), as in metamotivo
+ortho_coef: 1.0
+grad_clip: 1.0
+boltzmann_temp: null    # null = greedy target policy (Eq. 10)
 
-lr: 3e-4
-batch_size: 1024
-discrete: ${env.discrete}
-
-# MISC
-discount: 0.98  # Discount factor. 0.99 - for maze, 0.98 others
-tau: 0.01  # Target network update rate.
-clip_by_global_norm: True
-
-# Dataset hyperparameters.
-dataset_class: GCDataset  # Dataset class name.
-value_p_curgoal: 0.0  # Probability of using the current state as the value goal.
-value_p_trajgoal: 1.0  # Probability of using a future state in the same trajectory as the value goal.
-value_p_randomgoal: 0.0  # Probability of using a random state as the value goal.
-value_geom_sample: True  # Whether to use geometric sampling for future value goals.
-actor_p_curgoal: 0.0  # Probability of using the current state as the actor goal.
-actor_p_trajgoal: 0.0  # Probability of using a future state in the same trajectory as the actor goal.
-actor_p_randomgoal: 1.0  # Probability of using a random state as the actor goal.
-actor_geom_sample: False  # Whether to use geometric sampling for future actor goals.
-gc_negative: True  # Whether to use '0 if s : :  g else -1' (True) or '1 if s : :  g else 0' (False) as reward.
-p_aug: 0.0  # Probability of applying image augmentation.
-frame_stack: null  # Number of frames to stack.
+encoder:
+  emb_dim: 96
+  num_layers: 4
+  num_heads: 4
+  mlp_dim: 256
+  predictor_hidden_dims: [256, 256, 256]
+  lr: 1e-4
+  kl_coef: 0.0          # weight of the KL(N(mu, sigma) || N(0, I)) prior; > 0 collapses the belief here
+  objective: blocked    # blocked (wall-collision classification) | mse (next-state regression, as in Algorithm 1)
+  query: heldout        # heldout (other transitions of the same layout) | context (the context transitions)
+  num_queries: 128

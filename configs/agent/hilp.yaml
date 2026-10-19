@@ -1,0 +1,14 @@
+# HILP baseline (Park et al., 2024), discrete-action version. Settings follow onestep-fb's HILP config.
+name: hilp
+use_context: false
+obs_encoding: onehot    # onehot (row / column one-hot) | xy (normalised coordinates)
+z_dim: 100
+z_mix_ratio: 0.5
+phi_hidden_dims: [512, 512, 512]
+q_hidden_dims: [1024, 1024]
+lr: 3e-4
+discount: 0.95
+tau: 0.005
+expectile: 0.5
+p_trajgoal: 0.625     # value goals: future state of the same episode, otherwise a random state
+grad_clip: 1.0

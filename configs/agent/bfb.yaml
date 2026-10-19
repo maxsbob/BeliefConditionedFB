@@ -1,0 +1,6 @@
+# Belief-FB (Sec. 3.2): F is conditioned on the belief h inferred by the transformer f_dyn.
+defaults:
+  - fb
+  - _self_
+name: bfb
+use_context: true

@@ -1,0 +1,48 @@
+# Randomized Four-Rooms: training + zero-shot evaluation of FB / BFB / RFB.
+defaults:
+  - _self_
+  - agent: bfb
+
+seed: 0
+num_train_layouts: 20            # number of training dynamics (10 / 20 / 30 / 50 in Fig. 5)
+context_len: 100                 # transitions given to f_dyn (50 / 100 / 150 / 200 in Fig. 5)
+
+data:
+  total_transitions: 1_000_000   # same budget for every number of layouts (Table 4)
+  episode_length: 100
+  seed: 0                        # the dataset is shared across training seeds
+  path: data/fourrooms_layouts${num_train_layouts}_${data.total_transitions}.npz
+
+# Stage 1 (BFB/RFB only): pre-train the context encoder f_dyn, then freeze it.
+encoder_steps: 30_000
+encoder_cache_dir: data/encoders  # shared by BFB / RFB runs with identical encoder settings (null = off)
+encoder_batch_size: 256
+embedding_bank_size: 512         # frozen-encoder beliefs pre-computed per training layout (speed-up only)
+
+# Stage 2: FB training. These steps do NOT include the encoder pre-training steps.
+fb_steps: 1_000_000
+batch_size: 1024
+
+eval:
+  interval: 50_000
+  num_contexts: 5                # independent exploration episodes per (layout, goal)
+  num_test_layouts: 20
+  max_steps: 100
+  online_belief: true            # BFB/RFB: refine the belief with the agent's own transitions during the rollout
+  random_start: true             # also report returns from uniformly random start cells
+
+log_interval: 5_000
+out_dir: runs/${agent.name}/layouts${num_train_layouts}_ctx${context_len}/seed${seed}
+save_checkpoint: true
+
+wandb:
+  mode: disabled                 # online | offline | disabled
+  project: belief-fb
+  entity: null
+
+hydra:
+  run:
+    dir: ${out_dir}
+  output_subdir: .hydra
+  job:
+    chdir: false

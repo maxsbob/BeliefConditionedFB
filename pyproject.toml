@@ -1,0 +1,44 @@
+[project]
+name = "belief-fb"
+version = "2.0.0"
+description = "Belief-FB / Rotation-FB: zero-shot adaptation of Forward-Backward representations to unseen dynamics (ICLR 2026)."
+readme = "README.md"
+license = { file = "LICENSE.txt" }
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "jax[cuda12]>=0.6",
+    "flax>=0.10",
+    "optax>=0.2.4",
+    "numpy>=1.26",
+    "hydra-core>=1.3",
+    "omegaconf>=2.3",
+    "wandb>=0.19",
+    "matplotlib>=3.8",
+    "scikit-learn>=1.4",
+    "tqdm>=4.66",
+    "pandas>=2.1",
+]
+
+[project.optional-dependencies]
+pointmass = [
+    "ogbench>=1.1",
+    "mujoco>=3.1",
+    "gymnasium>=1.0",
+]
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["bfb"]
+
+[tool.uv]
+# PyPI is always reached directly; see setup.sh (proxy variables are stripped for uv).
+python-preference = "system"
+
+[tool.ruff]
+line-length = 120

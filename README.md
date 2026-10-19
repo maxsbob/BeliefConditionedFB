@@ -1,87 +1,156 @@
-# Belief-Conditioned FB
+# Belief-Conditioned FB (BFB / RFB)
 
-*This repository contains implementation of Belief-FB/Rotation-FB in JAX presented in paper **Zero-Shot Adaptation of Behavioral Foundation Models to Unseen Dynamics***
+JAX implementation of **Belief-FB** and **Rotation-FB** from
+*Zero-Shot Adaptation of Behavioral Foundation Models to Unseen Dynamics* (ICLR 2026,
+[arXiv:2505.13150](https://arxiv.org/abs/2505.13150)).
 
-## Environment Setup
+> **Version 2.** This is a rewrite of the code originally released with the paper. It fixes a number of bugs that
+> made the original results hard to reproduce, makes the experimental protocol explicit and reproducible from a
+> single command, and adds the HILP and Laplacian baselines. The changes are listed in
+> [What changed in v2](#what-changed-in-v2). The original code is kept under the git tag `v1.0-paper-original`.
+> Currently v2 covers the Randomized Four-Rooms experiments (Fig. 5 / Table 1, Four-Rooms columns).
 
-All code is written in JAX, so ensure non-conflicting versions of CUDA and latest version of JAX.
-Config management is done via Hydra.
+## Installation
 
-1. Conda Environment Setup
+The project uses [uv](https://docs.astral.sh/uv/) (no conda needed):
 
-	```zsh
-	# Create and activate conda environment
-	conda create -n BFB python=3.9
-	conda activate BFB	
-	
-	# Install dependencies
-	pip install -r requirements.txt
-	```
-
-2. Environment Configuration
-
-	```zsh
-	# Base project directory
-	export PROJECT_DIR=/absolute/path/to/BFB
-	
-	# Python path configuration
-	export SRC_DIR=${PROJECT_DIR}/src
-	export PYTHONPATH="${SRC_DIR}:${PYTHONPATH}"
-	```
-
-3. `requirements.txt`: File with Python dependencies
-
-## Code Structure
-
-**Key Components:**
-The repository is structured as follows:
-
-1. `agents/`: Folder containing implementations of the BFB/RFB/FB methods (Section 3.2)
-2. `notebooks`: Demonstrations of performance of different algorithms applied to benchmarks from paper (Section 4)
-	1. `vanilla_fb_doors.ipynb` (on Rnadomized Doors environment)
-	1. `vanilla_fb_4rooms.ipynb` (Performance of Vanilla Forward-Backward method on static 4Rooms)
-	2. `vanilla_fb_4rooms_randomized.ipynb` (Interference problem illustrated in Section 3.1 on Randomized 4Rooms)
-
-	3. `dynamics_fb_4rooms.ipynb` (Implementation of BFB from Section 3.2 on Randomized 4Rooms)
-	4. `dynamics_fb_doors_debug.ipynb` (Visualization of policy encoded space on custom Randomized Doors and RFB, Section 3.3)
-	5. `dynamics_fb_4rooms_rot.ipynb` (Performance of RFB on Randomized 4Rooms)
-
-
-```
-├── README.md              
-├── requirements.txt       # Libraries dependencies
-├── agents/               # Main folder, contating implementations of various methods
-	├── dynamics_fb.py # Implementation of BFB from paper
-	├── dynamics_rfb.py # Implementation of RFB from paper
-├── configs/                   # Config files used for experiments
-│   ├── agent    # hyperparameters for each method
-│   ├── env         # configs for different benchmarks
-│   └── experiment      # Preconfigured config files, each defines an experiment
-|	└── entry.yaml # main entry point for hydra
-└── data_gen_scripts/ # folder used to generate behavior policies for randomized Pointmass
-    ├── datasets/
-    │   ├── commands.sh              
-    │   └── generate_locomaze.py # Define type of policy, save path, episode length etc.
-    ├── envs/ # folder with implmenetations of all benchmarks used in paper
-    ├── notebooks/ # Interactive visualizations & training of different agents
-    └── utils/
-        └── datasets.py     # Contains main class for Dataset creation from numpy array
-		└── evaluation.py # Different evaluation procedures based on the bench
-		└── flax_utils.py # Flexible and simple extension of flax TrainState
-		└── networks.py # Implementations of different network architectures
-		└── transformer_nets.py # Implementation of permutation invariant Transformer encoder
+```bash
+./setup.sh
 ```
 
-## Pointmass
-For generating random pointmass layouts, run `envs/ogbench/generate_maze_maps.py` and set `num_maps` to any number of grid layouts. The resulting dictionary of grid types will be saved as `pointmaze-maps.npy` file. 
+`setup.sh` runs `uv sync` with `http(s)_proxy` removed from the environment, so packages are always downloaded
+directly from PyPI even if a proxy is exported for other tools (e.g. wandb). Prefix commands with `uv run` or activate
+`.venv`. JAX is installed with CUDA 12 wheels (`jax[cuda12]`); the NVIDIA driver must support CUDA 12.
 
-To generate dataset, run `data_gen_scripts/generate locomaze.py` for each layout.
-All visualizations and training for `pointmass` are done in `pointmass_fb.ipynb`.
+## Quick start
 
-## AntWind
-For AntWind we provide dataset, collected by pretrained SAC for various wind directions, which can be downloaded from [GoogleDrive](https://drive.google.com/drive/folders/1ub8KdqcjgNLZv1aX6TX5mRM6RUxC8_vi?usp=sharing) and placed in folder `envs/mujoco/data_custom_ant`. Visualizations for transformer context disentanglement is in `ant_wind_dynamics.ipynb`.
+```bash
+# Belief-FB, 20 training layouts, context length 100
+uv run scripts/train_fourrooms.py agent=bfb num_train_layouts=20
 
-## Run
-`python main_dynamics_discrete.py` (with Wandb logging). If debug: `python main.py --disable_jit=True` (also disables Wandb logging). Provide path to precollected dataset, saved from corresponding env in notebook (ipynb).
+# Rotation-FB, other settings
+uv run scripts/train_fourrooms.py agent=rfb num_train_layouts=30 context_len=150 seed=1
 
-For discrete case, select corresponding config from `configs/experiments` folder and run `python main_dynamics_discrete.py experiment=*config name*`
+# Baselines
+uv run scripts/train_fourrooms.py agent=fb      # vanilla FB
+uv run scripts/train_fourrooms.py agent=hilp    # HILP
+uv run scripts/train_fourrooms.py agent=lap     # Laplacian
+```
+
+The dataset is generated on first use (`data/fourrooms_layouts{N}_1000000.npz`, < 1 min). Metrics go to
+`runs/<agent>/.../metrics.jsonl` and `final.json`; set `wandb.mode=online` to also log to Weights & Biases.
+All hyperparameters are in `configs/` (Hydra) and can be overridden from the command line.
+
+### Reproducing Fig. 5 (Randomized Four-Rooms)
+
+```bash
+uv run scripts/launch.py --grid layouts --gpus 0 1 --jobs-per-gpu 3   # number of training layouts, 5 methods x 3 seeds
+uv run scripts/launch.py --grid context --gpus 0 1 --jobs-per-gpu 3   # context length, BFB / RFB x 3 seeds
+uv run scripts/plot_fig5.py --root runs/fig5 --out figures/fig5_fourrooms.png
+```
+
+`launch.py` skips finished runs, so it can be re-run to resume. One run (encoder pre-training + 1M FB updates) takes
+about 1 h on an RTX 3090 Ti when it has the GPU to itself.
+
+## Experimental protocol (Randomized Four-Rooms)
+
+**Environment.** 11x11 grid with an inner horizontal and an inner vertical wall at random positions, one door in each
+of the four wall segments. The layout is the hidden context; observations are the (row, col) position; actions are
+{up, down, left, right}; moving into a wall leaves the agent in place. Layout `i` is generated by
+`bfb.envs.fourrooms.make_layout(seed=i)` (identical to the layouts used in the paper).
+
+**Datasets (Table 4).** Training layouts are seeds `0 .. N-1`. Each dataset has 1,000,000 transitions in total,
+collected by a uniform random policy from uniformly random start cells, in episodes of 100 steps:
+
+| # layouts | episodes / layout | episode length | transitions |
+|---|---|---|---|
+| 10 | 1000 | 100 | 1,000,000 |
+| 20 | 500 | 100 | 1,000,000 |
+| 30 | 333 | 100 | 999,000 |
+| 50 | 200 | 100 | 1,000,000 |
+
+**Training.**
+1. *(BFB/RFB only)* The transformer encoder f_dyn is pre-trained for 50K steps (`encoder_steps`) and then frozen.
+2. F and B are trained for 1M steps (`fb_steps`). The encoder pre-training steps are **not** included in these 1M.
+
+**Evaluation** (`bfb/evaluation.py`). Train set: all N training layouts. Test set: 20 fixed held-out layouts
+(seeds 10000-10019, checked to differ from all of the first 50 training layouts); it is the same set for every N.
+For each layout:
+1. *Context:* one reward-free random-exploration episode of `context_len` steps from the start cell (1, 1) is encoded
+   by f_dyn; the belief mean is used as h.
+2. *Task:* each of 3 fixed goals, (2, 8), (8, 2), (8, 8), one in each room other than the start room. The task vector
+   is z = B(goal) (HILP: z ∝ φ(goal) − φ(start); LAP: z ∝ φ(goal)).
+3. *Rollout:* from (1, 1), greedy actions argmax_a F(s, a, z[, h])ᵀz for at most 100 steps. Return = 1 if the goal
+   is reached, else 0.
+
+The reported return is the mean over layouts × 3 goals × 5 independent context episodes (`eval.num_contexts`).
+The environment and greedy policy are deterministic, so the context episodes are the only source of randomness.
+
+## Code structure
+
+```
+bfb/
+  envs/fourrooms.py   randomized four-rooms layouts + a vectorised numpy environment
+  data.py             dataset generation and on-device sampling (transitions, context windows, queries)
+  networks.py         F (discrete, ensemble of 2), B, transformer encoder f_dyn, outcome predictor
+  agent.py            FB / Belief-FB / Rotation-FB agent (encoder pre-training + FB training)
+  vmf.py              von Mises-Fisher sampler (Wood, 1994) + Householder rotation (Algorithm 2)
+  baselines.py        HILP and Laplacian baselines (discrete actions)
+  evaluation.py       zero-shot evaluation protocol
+  diagnostics.py      layout identification accuracy of the belief h
+configs/              Hydra configs (train.yaml, agent/{fb,bfb,rfb,hilp,lap}.yaml)
+scripts/
+  train_fourrooms.py  train + evaluate one configuration
+  launch.py           run a grid of configurations on several GPUs
+  plot_fig5.py        aggregate runs, plot Fig. 5 and write a results table
+```
+
+## What changed in v2
+
+Bugs in the original release:
+
+* **Dataset size.** The notebook used a fixed 250 episodes per layout, so the 30-layout dataset had only 750K
+  transitions instead of 1M. v2 fixes the total budget and derives the episodes per layout (table above).
+* **Test layouts changed with N.** The test layouts were seeds `N+40 .. N+59` (and `N+100 .. N+109` in the
+  notebooks), so every point on the x-axis of Fig. 5 was evaluated on a different test set. v2 uses one fixed set.
+* **Start position.** The evaluation was supposed to start from (1, 1), but `evaluate_fourrooms_dynamics` reset the
+  agent to a random cell. v2 always starts from (1, 1).
+* **Noisy beliefs at test time.** The belief was sampled at evaluation with a fixed PRNG key. v2 uses the mean.
+* **Target policy.** The discrete FB target used a softmax with temperature 350 over Q, which is close to the
+  uniform policy, so F learned the successor measure of a random policy. v2 uses the greedy policy of Eq. (10).
+* **Rotation-FB sampler.** The vMF sampler had no rejection step (not Wood's algorithm) and reused the same PRNG key
+  for z, the mixing mask and the belief noise. v2 implements Wood's sampler (validated against the analytic mean
+  cosine) and uses independent keys.
+* **Episode boundaries.** `terminals` were never set, so whole layouts were treated as one trajectory. v2 stores
+  episodes explicitly.
+* Actions were fed to f_dyn as raw integers; v2 uses one-hot actions.
+
+Changes to the method that make training work reliably (configurable):
+
+* **Forward-map preprocessors** (`agent.f_preprocessor_dims`). Appendix E.1.2 describes separate embeddings of s and
+  (s, [h; z]), but the original discrete code fed the 2-D position concatenated with the 100-D z to a single MLP.
+  Without the preprocessors FB fails to solve even a single fixed layout.
+* **FB loss** follows Meta's reference implementation (`metamotivo/fb`): Eq. (13) with a mean over the two target
+  networks, B projected to the sphere and the orthonormality loss. The TD-LSIF variant from
+  [onestep-fb](https://github.com/chongyi-zheng/onestep-fb) (diagonal weighted by 1 − γ) is available with
+  `agent.fb_loss=lsif`.
+* **Encoder objective** (`agent.encoder.objective`, `agent.encoder.query`). Algorithm 1 predicts s' for the
+  transitions of the context itself. In Four-Rooms the only layout-dependent part of the dynamics is whether a move
+  is blocked by a wall, and next-state regression gives almost no signal for it. The encoder never learned to
+  identify the layout (chance-level accuracy). v2 predicts, from h, whether held-out transitions of the same layout
+  are blocked. The paper's objective is available with `objective=mse query=context`.
+* **No KL prior on h by default** (`agent.encoder.kl_coef=0`). With the KL term the belief collapses to the prior.
+* **Faster training:** sampling and updates run on the GPU inside `jax.lax.scan`. With the encoder frozen,
+  beliefs are pre-computed for 512 random contexts per training layout (`embedding_bank_size`) and drawn from this
+  bank, which is equivalent to encoding a fresh context at every step.
+
+## Citation
+
+```bibtex
+@inproceedings{bobrin2026zeroshot,
+  title     = {Zero-Shot Adaptation of Behavioral Foundation Models to Unseen Dynamics},
+  author    = {Bobrin, Maksim and Zisman, Ilya and Nikulin, Alexander and Kurenkov, Vladislav and Dylov, Dmitry},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2026}
+}
+```

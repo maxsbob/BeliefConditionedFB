@@ -1,0 +1,14 @@
+# Laplacian (LAP) baseline (Wu et al., 2019), discrete-action version.
+name: lap
+use_context: false
+obs_encoding: onehot    # onehot (row / column one-hot) | xy (normalised coordinates)
+z_dim: 100
+z_mix_ratio: 0.5
+phi_hidden_dims: [512, 512, 512]
+q_hidden_dims: [1024, 1024]
+lr: 3e-4
+discount: 0.95
+tau: 0.005
+ortho_coef: 1.0
+p_trajgoal: 0.0       # unused by LAP (goals are only used as independent states for the orthonormality term)
+grad_clip: 1.0

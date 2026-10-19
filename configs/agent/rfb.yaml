@@ -1,0 +1,8 @@
+# Rotation-FB (Sec. 3.3): BFB + task vectors sampled from vMF(h, kappa) instead of uniformly.
+defaults:
+  - fb
+  - _self_
+name: rfb
+use_context: true
+z_sampling: vmf
+kappa: 50
