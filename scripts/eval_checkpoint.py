@@ -19,7 +19,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('runs', nargs='+')
     parser.add_argument('--start', choices=['fixed', 'random'], default='fixed')
-    parser.add_argument('--num-contexts', type=int, default=10)
+    parser.add_argument('--num-contexts', type=int, default=20)
     parser.add_argument('--online-belief', action='store_true')
     parser.add_argument('--belief-samples', type=int, default=0)
     parser.add_argument('--belief-kappa', type=float, default=None)

@@ -29,8 +29,6 @@ GRIDS = {
     'baselines': dict(agent=['fb', 'hilp', 'lap'], num_train_layouts=[10, 20, 30, 50], context_len=[100]),
     # Fig. 5, "Context Length": BFB / RFB with 20 training layouts.
     'context': dict(agent=['rfb', 'bfb'], num_train_layouts=[20], context_len=[50, 150, 200]),
-    # Quick check of all methods on one setting.
-    'pilot': dict(agent=['rfb', 'bfb', 'fb', 'hilp', 'lap'], num_train_layouts=[20], context_len=[100]),
     # Fig. 6: kappa ablation for RFB.
     'kappa': dict(agent=['rfb'], num_train_layouts=[20], context_len=[100], **{'agent.kappa': [50, 200]}),
     # Pre-train (and cache) the encoders of all Fig. 5 settings before launching many jobs that share them.
