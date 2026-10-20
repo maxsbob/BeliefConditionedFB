@@ -1,8 +1,10 @@
-# Rotation-FB (Sec. 3.3): BFB + task vectors sampled from vMF(h, kappa) instead of uniformly.
+# Rotation-FB (Sec. 3.3): BFB + task vectors sampled from vMF(h, kappa) instead of uniformly (Algorithm 2).
+# v2 adds belief rotation (h ~ vMF(h, belief_kappa) during training). Other variants: cone_kappa, geodesic_kappa.
 defaults:
   - fb
   - _self_
 name: rfb
 use_context: true
 z_sampling: vmf
-kappa: 50
+kappa: 10
+belief_kappa: 100       # belief rotation (v2): h ~ vMF(h, 100) during FB training

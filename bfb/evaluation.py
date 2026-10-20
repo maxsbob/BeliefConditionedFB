@@ -24,7 +24,8 @@ from bfb.envs.fourrooms import START_POS, VecFourRooms, eval_goals, make_layout,
 
 
 def evaluate(agent, layout_seeds, context_len: int, num_contexts: int = 5, max_steps: int = 100, seed: int = 0,
-             start: str = 'fixed', online_belief: bool = False, belief_samples: int = 0, belief_kappa=None):
+             start: str = 'fixed', online_belief: bool = False, belief_samples: int = 0, belief_kappa=None,
+             epsilon: float = 0.0, task_kappa=None):
     """Mean return over layouts x goals x contexts (see module docstring).
 
     Belief options (BFB / RFB):
@@ -81,11 +82,17 @@ def evaluate(agent, layout_seeds, context_len: int, num_contexts: int = 5, max_s
     for _ in range(max_steps):
         if recompute_z:  # HILP: z = (phi(g) - phi(s_t)) / ||.|| at every step
             z = agent.infer_z_goal(params, normalize_obs(goal_pos), normalize_obs(pos))
-        if belief_samples and h is not None:
+        if task_kappa is not None:  # act with a task code sampled around z at every step (vMF(z, task_kappa))
+            key = jax.random.key(int(rng.integers(2**31)))
+            actions = np.asarray(agent.act(params, normalize_obs(pos), agent.perturb_task(key, z, task_kappa), h))
+        elif belief_samples and h is not None:
             key = jax.random.key(int(rng.integers(2**31)))
             actions = np.asarray(agent.act_marginal(params, normalize_obs(pos), z, h, key, belief_samples, belief_kappa))
         else:
             actions = np.asarray(agent.act(params, normalize_obs(pos), z, h))
+        if epsilon > 0:  # epsilon-greedy (diagnostic only)
+            explore = rng.random(len(actions)) < epsilon
+            actions = np.where(explore, rng.integers(4, size=len(actions)), actions)
         prev = pos
         pos, reward, done = env.step(actions)
         if online_belief and h is not None:
@@ -98,4 +105,5 @@ def evaluate(agent, layout_seeds, context_len: int, num_contexts: int = 5, max_s
         if done.all():
             break
     per_layout = returns.reshape(n_layouts, num_contexts * n_goals).mean(1)
-    return {'return': float(returns.mean()), 'per_layout': per_layout}
+    per_goal = returns.reshape(-1, n_goals).mean(0)
+    return {'return': float(returns.mean()), 'per_layout': per_layout, 'per_goal': per_goal}

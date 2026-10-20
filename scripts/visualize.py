@@ -30,6 +30,11 @@ ARROWS = ['↑', '↓', '←', '→']
 def load_agent(run_dir):
     with open(os.path.join(run_dir, 'final.json')) as f:
         cfg = OmegaConf.create(json.load(f)['config'])
+    # Runs saved before an option existed: fill missing keys from the current defaults (all new options are off).
+    defaults_file = cfg.agent.name if cfg.agent.name in ('hilp', 'lap') else 'fb'
+    defaults = OmegaConf.load(os.path.join(os.path.dirname(__file__), '..', 'configs', 'agent', f'{defaults_file}.yaml'))
+    cfg.agent = OmegaConf.merge({k: (None if k in ('cone_kappa', 'geodesic_kappa', 'belief_kappa') else v)
+                                 for k, v in defaults.items()}, cfg.agent)
     if cfg.agent.name in ('hilp', 'lap'):
         agent = LatentQAgent(cfg.agent, 2, NUM_ACTIONS, cfg.data.episode_length, cfg.seed)
     else:

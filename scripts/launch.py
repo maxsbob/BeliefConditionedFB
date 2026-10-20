@@ -24,13 +24,18 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 GRIDS = {
     # Fig. 5, "# of Environments": all methods, context length 100.
-    'layouts': dict(agent=['rfb', 'bfb', 'fb', 'hilp', 'lap'], num_train_layouts=[10, 20, 30, 50], context_len=[100]),
+    'layouts': dict(agent=['rfb', 'bfb'], num_train_layouts=[10, 20, 30, 50], context_len=[100]),
+    # Same with the baselines (FB, HILP, LAP); not context-dependent.
+    'baselines': dict(agent=['fb', 'hilp', 'lap'], num_train_layouts=[10, 20, 30, 50], context_len=[100]),
     # Fig. 5, "Context Length": BFB / RFB with 20 training layouts.
     'context': dict(agent=['rfb', 'bfb'], num_train_layouts=[20], context_len=[50, 150, 200]),
     # Quick check of all methods on one setting.
     'pilot': dict(agent=['rfb', 'bfb', 'fb', 'hilp', 'lap'], num_train_layouts=[20], context_len=[100]),
     # Fig. 6: kappa ablation for RFB.
-    'kappa': dict(agent=['rfb'], num_train_layouts=[20], context_len=[100], **{'agent.kappa': [10, 30, 100]}),
+    'kappa': dict(agent=['rfb'], num_train_layouts=[20], context_len=[100], **{'agent.kappa': [50, 200]}),
+    # Pre-train (and cache) the encoders of all Fig. 5 settings before launching many jobs that share them.
+    'encoders': dict(agent=['bfb'], num_train_layouts=[10, 20, 30, 50], context_len=[100]),
+    'encoders_context': dict(agent=['bfb'], num_train_layouts=[20], context_len=[50, 150, 200]),
 }
 
 
@@ -70,11 +75,25 @@ def main():
                 out_dir, job_args = q.get_nowait()
             except queue.Empty:
                 return
+            # Skip jobs another launcher is currently running (lock file with a live pid).
+            lock = os.path.join(out_dir, '.running')
+            if os.path.exists(lock):
+                try:
+                    os.kill(int(open(lock).read()), 0)
+                    print(f'[gpu {gpu}] skipped (running elsewhere): {out_dir}', flush=True)
+                    continue
+                except (OSError, ValueError):
+                    pass
+            os.makedirs(out_dir, exist_ok=True)
             env = dict(os.environ, CUDA_VISIBLE_DEVICES=gpu, XLA_PYTHON_CLIENT_PREALLOCATE='false')
             log = os.path.join('logs', out_dir.replace('/', '_') + '.log')
             cmd = [sys.executable, os.path.join(ROOT, 'scripts', 'train_fourrooms.py'), *job_args]
             with open(log, 'w') as f:
-                ret = subprocess.call(cmd, stdout=f, stderr=subprocess.STDOUT, env=env)
+                proc = subprocess.Popen(cmd, stdout=f, stderr=subprocess.STDOUT, env=env)
+                with open(lock, 'w') as lf:
+                    lf.write(str(proc.pid))
+                ret = proc.wait()
+            os.remove(lock)
             print(f'[gpu {gpu}] {"done" if ret == 0 else f"FAILED ({ret})"}: {out_dir}', flush=True)
 
     threads = [threading.Thread(target=worker, args=(g,)) for g in args.gpus for _ in range(args.jobs_per_gpu)]

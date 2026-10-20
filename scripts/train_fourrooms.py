@@ -89,13 +89,13 @@ def main(cfg: DictConfig):
         res = {}
         for split, seeds in [('train', train_seeds), ('test', test_seeds)]:
             kw = dict(context_len=cfg.context_len, num_contexts=cfg.eval.num_contexts, max_steps=cfg.eval.max_steps,
-                      seed=step, online_belief=cfg.eval.online_belief)
+                      seed=step, online_belief=cfg.eval.online_belief, task_kappa=cfg.eval.task_kappa)
             res[f'eval/{split}_return'] = evaluate(agent, seeds, **kw)['return']
             if cfg.eval.random_start:
                 res[f'eval/{split}_return_random_start'] = evaluate(agent, seeds, start='random', **kw)['return']
-            if agent.use_context and cfg.eval.online_belief:  # also report the point-belief protocol of the paper
-                kw['online_belief'] = False
-                res[f'eval/{split}_return_point_belief'] = evaluate(agent, seeds, **kw)['return']
+            # Also report the protocol of the paper: greedy actions and a single (point) belief.
+            res[f'eval/{split}_return_greedy_point_belief'] = evaluate(
+                agent, seeds, **{**kw, 'online_belief': False, 'task_kappa': None})['return']
         logger.log(res, step)
         return res
 

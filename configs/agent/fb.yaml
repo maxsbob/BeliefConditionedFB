@@ -9,6 +9,7 @@ h_dim: 100
 kappa: null             # concentration of the vMF task prior z ~ vMF(h, kappa) (z_sampling: vmf)
 standardize_h: true     # standardise the belief with training statistics and project it to the sphere
 oracle_context: false   # Oracle-ID: h = one-hot training-layout index instead of f_dyn
+task_kappa: null        # train on goal codes rotated by vMF(B(g), task_kappa) (null = off)
 cone_kappa: null        # RFB cone embedding: policy codes live in a cap around h of width set by kappa (null = off)
 cone_drop_h: false      # with cone embedding: do not also feed h to F (context enters only through the cone)
 geodesic_kappa: null    # RFB geodesic rotation of h towards other contexts' beliefs (null = off)

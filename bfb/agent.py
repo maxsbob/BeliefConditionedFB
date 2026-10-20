@@ -42,6 +42,7 @@ class FBAgent:
         self.h_stats = None  # set after encoder pre-training (see belief_stats)
         # Inverse-CDF tables for fast vMF sampling (see bfb.vmf.w_quantile_table).
         self.z_w_table = w_quantile_table(cfg.kappa, cfg.z_dim) if cfg.z_sampling == 'vmf' else None
+        self.task_w_table = w_quantile_table(cfg.task_kappa, cfg.z_dim) if cfg.task_kappa is not None else None
         self.h_w_table = (w_quantile_table(cfg.belief_kappa, cfg.h_dim)
                           if self.use_context and cfg.belief_kappa is not None else None)
         h_dim = cfg.h_dim if self.use_context else None
@@ -171,13 +172,17 @@ class FBAgent:
     def sample_z(self, params, batch, key):
         """Mixture of 'prior' task vectors (uniform or vMF around h) and backward-induced ones z = B(s)."""
         bs = batch['obs'].shape[0]
-        k_prior, k_mix, k_perm = jax.random.split(key, 3)
+        k_prior, k_mix, k_perm, k_task = jax.random.split(key, 4)
         if self.cfg.z_sampling == 'uniform':
             z_prior = project_to_sphere(jax.random.normal(k_prior, (bs, self.cfg.z_dim)))
         else:
             z_prior = project_to_sphere(sample_vmf(k_prior, batch['h'], self.cfg.kappa, self.z_w_table))
         goals = batch['next_obs'][jax.random.permutation(k_perm, bs)]
         z_b = project_to_sphere(jax.lax.stop_gradient(self.B(params, goals)))
+        if self.cfg.task_kappa is not None:
+            # Task rotation: train on codes rotated around the goal codes, z ~ vMF(B(g), task_kappa), which is the
+            # distribution the agent acts with at test time (eval.task_kappa).
+            z_b = project_to_sphere(sample_vmf(k_task, z_b, self.cfg.task_kappa, self.task_w_table))
         use_prior = jax.random.uniform(k_mix, (bs, 1)) < self.cfg.z_mix_ratio
         return jnp.where(use_prior, z_prior, z_b)
 
@@ -345,6 +350,11 @@ class FBAgent:
     @partial(jax.jit, static_argnums=0)
     def q_values(self, params, obs, z, h=None):
         return jnp.einsum('ebad,bd->eba', self.F(params, obs, z, h), z).min(0)
+
+    @partial(jax.jit, static_argnums=(0, 3))
+    def perturb_task(self, key, z, kappa):
+        """Task code z' ~ vMF(z, kappa), projected to the sphere (stochastic but goal-directed behaviour)."""
+        return project_to_sphere(sample_vmf(key, z, kappa, jnp.asarray(w_quantile_table(kappa, z.shape[-1]))))
 
     @partial(jax.jit, static_argnums=(0, 6, 7))
     def act_marginal(self, params, obs, z, h, key, num_samples, kappa):

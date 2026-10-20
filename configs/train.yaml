@@ -20,14 +20,15 @@ encoder_batch_size: 256
 embedding_bank_size: 512         # frozen-encoder beliefs pre-computed per training layout (speed-up only)
 
 # Stage 2: FB training. These steps do NOT include the encoder pre-training steps.
-fb_steps: 1_000_000
+fb_steps: 300_000
 batch_size: 1024
 
 eval:
-  interval: 50_000
-  num_contexts: 5                # independent exploration episodes per (layout, goal)
+  interval: 100_000
+  num_contexts: 20               # independent exploration episodes per (layout, goal)
   num_test_layouts: 20
   max_steps: 100
+  task_kappa: 200                # act with task codes z' ~ vMF(z, task_kappa) (null = greedy argmax with z)
   online_belief: true            # BFB/RFB: refine the belief with the agent's own transitions during the rollout
   random_start: true             # also report returns from uniformly random start cells
 
