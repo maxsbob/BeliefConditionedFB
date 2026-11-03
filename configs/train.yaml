@@ -24,6 +24,8 @@ fb_steps: 300_000
 batch_size: 1024
 
 eval:
+  seed: 20261103                # fixed across checkpoints and algorithms (paired evaluation)
+  initial: true
   interval: 100_000
   num_contexts: 20               # independent exploration episodes per (layout, goal)
   num_test_layouts: 20

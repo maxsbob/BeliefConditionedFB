@@ -75,11 +75,26 @@ class VecFourRooms:
         max_steps: episode horizon (100 in the paper).
     """
 
-    def __init__(self, grids: np.ndarray, max_steps: int = 100):
+    def __init__(
+        self,
+        grids: np.ndarray,
+        max_steps: int = 100,
+        *,
+        slip: float = 0.0,
+        action_map=None,
+        rng: np.random.Generator | None = None,
+    ):
         self.grids = np.asarray(grids)
         self.batch = len(self.grids)
         self.max_steps = max_steps
         self._b = np.arange(self.batch)
+        if not 0 <= slip <= 1:
+            raise ValueError("slip must be in [0, 1]")
+        self.slip = slip
+        self.action_map = np.arange(NUM_ACTIONS) if action_map is None else np.asarray(action_map)
+        if sorted(self.action_map.tolist()) != list(range(NUM_ACTIONS)):
+            raise ValueError("action_map must be a permutation of the four actions")
+        self.rng = np.random.default_rng() if rng is None else rng
 
     def free_cells(self, i: int) -> np.ndarray:
         return np.argwhere(self.grids[i] == 0)
@@ -93,7 +108,13 @@ class VecFourRooms:
 
     def step(self, actions: np.ndarray):
         """Moves into walls leave the agent in place. Returns (next_pos, reward, done)."""
-        new = self.pos + MOTIONS[np.asarray(actions)]
+        actions = self.action_map[np.asarray(actions)]
+        if self.slip:
+            actions = np.where(
+                self.rng.random(self.batch) < self.slip, self.rng.integers(NUM_ACTIONS, size=self.batch), actions
+            )
+        new = self.pos + MOTIONS[actions]
+        new = np.clip(new, 0, np.asarray(self.grids.shape[1:]) - 1)
         blocked = self.grids[self._b, new[:, 0], new[:, 1]] == 1
         # Agents that already reached their goal stay there (the episode is over for them).
         stay = blocked | self.reached
@@ -108,9 +129,9 @@ class VecFourRooms:
         return self.pos.copy(), reward, done
 
 
-def random_walk(grids: np.ndarray, starts: np.ndarray, length: int, rng: np.random.Generator) -> dict:
+def random_walk(grids: np.ndarray, starts: np.ndarray, length: int, rng: np.random.Generator, **env_kwargs) -> dict:
     """Uniform random exploration policy. Returns arrays of shape (B, length, ...)."""
-    env = VecFourRooms(grids, max_steps=length)
+    env = VecFourRooms(grids, max_steps=length, rng=rng, **env_kwargs)
     obs = env.reset(starts)
     observations, actions, next_observations = [], [], []
     for _ in range(length):
@@ -120,11 +141,11 @@ def random_walk(grids: np.ndarray, starts: np.ndarray, length: int, rng: np.rand
         actions.append(a)
         next_observations.append(next_obs)
         obs = next_obs
-    return dict(
-        observations=np.stack(observations, 1),
-        actions=np.stack(actions, 1),
-        next_observations=np.stack(next_observations, 1),
-    )
+    return {
+        "observations": np.stack(observations, 1),
+        "actions": np.stack(actions, 1),
+        "next_observations": np.stack(next_observations, 1),
+    }
 
 
 def random_free_cells(grids: np.ndarray, rng: np.random.Generator) -> np.ndarray:

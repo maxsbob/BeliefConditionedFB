@@ -1,0 +1,7 @@
+{
+  "files": 546,
+  "groups": 288,
+  "evidence_sha256": "996d7a3572cae1367c9c99edf5917ff8e3a59e912e8b9c23852a94342e32cf1f",
+  "uncertainty": "sample SD across training seeds; n=1 has no SD",
+  "paired_CI": "paired hierarchical bootstrap over seeds and dynamics; 5000 draws"
+}

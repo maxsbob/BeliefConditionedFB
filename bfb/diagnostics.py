@@ -15,9 +15,9 @@ def belief_means(agent, layout_seeds, context_len: int, num_contexts: int, seed:
     ctx = random_walk(grids, np.tile(np.array(START_POS), (len(grids), 1)), context_len, rng)
     mu, _ = agent.encode(
         agent.enc_state.params,
-        normalize_obs(ctx['observations']),
-        ctx['actions'],
-        normalize_obs(ctx['next_observations']),
+        normalize_obs(ctx["observations"]),
+        ctx["actions"],
+        normalize_obs(ctx["next_observations"]),
     )
     return np.asarray(mu).reshape(len(layout_seeds), num_contexts, -1)
 

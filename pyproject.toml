@@ -1,6 +1,6 @@
 [project]
 name = "belief-fb"
-version = "2.0.0"
+version = "2.1.0"
 description = "Belief-FB / Rotation-FB: zero-shot adaptation of Forward-Backward representations to unseen dynamics (ICLR 2026)."
 readme = "README.md"
 license = { file = "LICENSE.txt" }
@@ -14,12 +14,18 @@ dependencies = [
     "omegaconf>=2.3",
     "wandb>=0.19",
     "matplotlib>=3.8",
+    "pillow>=10.1",
     "scikit-learn>=1.4",
     "tqdm>=4.66",
     "pandas>=2.1",
 ]
 
 [project.optional-dependencies]
+mujoco = [
+    "mujoco>=3.1",
+    "gymnasium>=1.0",
+]
+# Retained for compatibility with the original v2 install command.
 pointmass = [
     "ogbench>=1.1",
     "mujoco>=3.1",
@@ -42,3 +48,6 @@ python-preference = "system"
 
 [tool.ruff]
 line-length = 120
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

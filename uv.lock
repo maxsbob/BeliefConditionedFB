@@ -69,7 +69,7 @@ wheels = [
 
 [[package]]
 name = "belief-fb"
-version = "2.0.0"
+version = "2.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "flax", version = "0.10.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
@@ -88,6 +88,8 @@ dependencies = [
     { name = "optax" },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "pandas", version = "3.0.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "pillow", version = "12.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "pillow", version = "13.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "scikit-learn", version = "1.7.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "scikit-learn", version = "1.9.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "tqdm" },
@@ -95,6 +97,10 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+mujoco = [
+    { name = "gymnasium" },
+    { name = "mujoco" },
+]
 pointmass = [
     { name = "gymnasium" },
     { name = "mujoco" },
@@ -110,21 +116,24 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "flax", specifier = ">=0.10" },
+    { name = "gymnasium", marker = "extra == 'mujoco'", specifier = ">=1.0" },
     { name = "gymnasium", marker = "extra == 'pointmass'", specifier = ">=1.0" },
     { name = "hydra-core", specifier = ">=1.3" },
     { name = "jax", extras = ["cuda12"], specifier = ">=0.6" },
     { name = "matplotlib", specifier = ">=3.8" },
+    { name = "mujoco", marker = "extra == 'mujoco'", specifier = ">=3.1" },
     { name = "mujoco", marker = "extra == 'pointmass'", specifier = ">=3.1" },
     { name = "numpy", specifier = ">=1.26" },
     { name = "ogbench", marker = "extra == 'pointmass'", specifier = ">=1.1" },
     { name = "omegaconf", specifier = ">=2.3" },
     { name = "optax", specifier = ">=0.2.4" },
     { name = "pandas", specifier = ">=2.1" },
+    { name = "pillow", specifier = ">=10.1" },
     { name = "scikit-learn", specifier = ">=1.4" },
     { name = "tqdm", specifier = ">=4.66" },
     { name = "wandb", specifier = ">=0.19" },
 ]
-provides-extras = ["pointmass"]
+provides-extras = ["mujoco", "pointmass"]
 
 [package.metadata.requires-dev]
 dev = [

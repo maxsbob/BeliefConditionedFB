@@ -1,0 +1,23 @@
+defaults:
+  - continuous
+  - _self_
+
+family: antwind
+data_path: data/antwind_official
+episodes: 200
+episode_length: 256
+context_len: 100
+encoder_steps: 15000
+encoder_batch_size: 128
+fb_steps: 100000
+eval_contexts: 5
+out_dir: runs/antwind/${agent.name}/seed${seed}
+
+agent:
+  z_dim: 64
+  h_dim: 64
+  discount: 0.98
+  bc_coef: 0.03
+  encoder:
+    delta_scale: 1.0
+    predictor_hidden_dims: [256, 256]

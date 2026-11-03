@@ -1,0 +1,17 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  correctness:
+    runs-on: ubuntu-latest
+    env:
+      JAX_PLATFORMS: cpu
+      OMP_NUM_THREADS: 2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          python-version: '3.12'
+      - run: uv sync --locked --extra mujoco
+      - run: uv run --locked --extra mujoco ruff check bfb scripts tests
+      - run: uv run --locked --extra mujoco pytest -q

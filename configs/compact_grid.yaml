@@ -1,0 +1,32 @@
+# A declared smaller-compute alternative, evaluated separately from the 300K-step v2 reference.
+defaults:
+  - train
+  - _self_
+
+num_train_layouts: 30
+encoder_steps: 8000
+encoder_batch_size: 128
+embedding_bank_size: 256
+fb_steps: 100000
+batch_size: 256
+log_interval: 1000
+out_dir: runs/compact_grid/${agent.name}/seed${seed}
+
+eval:
+  initial: false
+  random_start: false
+  interval: 100000
+
+agent:
+  z_dim: 32
+  h_dim: 32
+  f_hidden_dims: [256, 256]
+  f_preprocessor_dims: [128]
+  f_embed_dim: 128
+  b_hidden_dims: [128, 128]
+  encoder:
+    emb_dim: 64
+    num_layers: 2
+    mlp_dim: 128
+    predictor_hidden_dims: [128, 128]
+    num_queries: 32

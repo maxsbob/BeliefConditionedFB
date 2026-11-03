@@ -20,3 +20,10 @@ logs/
 outputs/
 wandb/
 *.pkl
+
+# Raw evaluations are consolidated into results/evidence/experiments.jsonl.gz.
+results/grid*/
+results/continuous_*/
+results/antwind_controls/
+# Animation trial records are committed as compressed JSON companions.
+figures/dynamics/*.json

@@ -1,0 +1,383 @@
+{
+  "fourrooms_layouts10_1000000.npz": {
+    "sha256": "850de789242d47bdd5ecf15b5bed60fdc84ede22ec0a10a6120e522fae5ff2eb",
+    "transitions": 1000000,
+    "layouts": 10,
+    "unique_layouts": 10,
+    "transition_errors": 0,
+    "episode_discontinuities": 0,
+    "state_action_coverage_per_layout": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "fourrooms_layouts1_1000000.npz": {
+    "sha256": "9ab015789b317bd5a022f62cf28b953238e92fbf8ec6df312120e69a1b0b36f1",
+    "transitions": 1000000,
+    "layouts": 1,
+    "unique_layouts": 1,
+    "transition_errors": 0,
+    "episode_discontinuities": 0,
+    "state_action_coverage_per_layout": [
+      1.0
+    ]
+  },
+  "fourrooms_layouts20_1000000.npz": {
+    "sha256": "dc7fd8a913e22ca469f7a6da7b27f1b1b3123d04271ea9b68f40f79b0fdcc40f",
+    "transitions": 1000000,
+    "layouts": 20,
+    "unique_layouts": 20,
+    "transition_errors": 0,
+    "episode_discontinuities": 0,
+    "state_action_coverage_per_layout": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "fourrooms_layouts30_1000000.npz": {
+    "sha256": "832d726afd613bfbf2704058bf8133aa731692186c05d6d6b3e037fa9935ff6e",
+    "transitions": 999000,
+    "layouts": 30,
+    "unique_layouts": 30,
+    "transition_errors": 0,
+    "episode_discontinuities": 0,
+    "state_action_coverage_per_layout": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "fourrooms_layouts50_1000000.npz": {
+    "sha256": "cc151f8febcdab8f6f4d97c1a5eef9e51df1def9f5fcea86c9ba204e570501bb",
+    "transitions": 1000000,
+    "layouts": 50,
+    "unique_layouts": 50,
+    "transition_errors": 0,
+    "episode_discontinuities": 0,
+    "state_action_coverage_per_layout": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "antwind/default_ind_0.npz": {
+    "sha256": "04c1d0c19ce80da491bb89f56222613794b5ba7910c028ba8a6ebda432061baf",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 5,
+    "mean_episode_reward": 1410.2440520136704,
+    "max_abs_action": 0.9964412450790405
+  },
+  "antwind/default_ind_1.npz": {
+    "sha256": "27bc9eda3567c649a9279a01b3eeeada0718d44760ff2c350247e06156fa26fd",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 1,
+    "mean_episode_reward": 1353.543265209918,
+    "max_abs_action": 0.99490886926651
+  },
+  "antwind/default_ind_10.npz": {
+    "sha256": "a1019353fd445f317d6678d8b30d5e7a39482b257ce12ca80397835c325126e2",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 0,
+    "mean_episode_reward": 211.7591605075281,
+    "max_abs_action": 0.9740309715270996
+  },
+  "antwind/default_ind_11.npz": {
+    "sha256": "c30ef802041d3fcd71944e1da1434de343914bcede417714dcf7a68e21892bcd",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 0,
+    "mean_episode_reward": 345.5068773570424,
+    "max_abs_action": 0.9877029657363892
+  },
+  "antwind/default_ind_12.npz": {
+    "sha256": "3819a2bc6b4004a410bd9b54e75a6bf9fb421d55b8e4585bd1cfeb60bb39f78d",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 7,
+    "mean_episode_reward": 418.28479271167265,
+    "max_abs_action": 0.9940639138221741
+  },
+  "antwind/default_ind_13.npz": {
+    "sha256": "7f478e3d10c268d9600c1c129fbd9aa94e12c7c7552e59d3549fe60ac3d3040f",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 0,
+    "mean_episode_reward": 228.10576564830214,
+    "max_abs_action": 0.9409080743789673
+  },
+  "antwind/default_ind_14.npz": {
+    "sha256": "6ef204143c56986fdaddcb823c9b47077ae44e3914492e0c2488ad3382277ad4",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 17,
+    "mean_episode_reward": 553.5647176188764,
+    "max_abs_action": 0.9963797330856323
+  },
+  "antwind/default_ind_15.npz": {
+    "sha256": "4d58c66fa8edd3ce2710532047734c11671599dd31180fda8ef259e1686910b7",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 14,
+    "mean_episode_reward": 811.9235087013805,
+    "max_abs_action": 0.9999164938926697
+  },
+  "antwind/default_ind_16.npz": {
+    "sha256": "956d074432eb11e2ba2f2abbe7b2cfdfadd9a4f87c4429f98b5abb5f11eb5694",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 5,
+    "mean_episode_reward": 1038.1390030312496,
+    "max_abs_action": 0.9962766766548157
+  },
+  "antwind/default_ind_17.npz": {
+    "sha256": "7a3059273363a6021d3ce911eac5c1a8b62e0b1dfbdad9878c79f9c34fff783a",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 2,
+    "mean_episode_reward": 1201.3592032872948,
+    "max_abs_action": 0.9987984299659729
+  },
+  "antwind/default_ind_18.npz": {
+    "sha256": "bb832d582d639acceb7a77d8d1a448b84180ec2fe8f209fad34f27e291738e33",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 1,
+    "mean_episode_reward": 1341.5360053945149,
+    "max_abs_action": 0.997319221496582
+  },
+  "antwind/default_ind_19.npz": {
+    "sha256": "b1b027994f7ae87cfa3549d944adff24c053e18b4856b74c19f8698b5681daf8",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 1,
+    "mean_episode_reward": 1413.4263813550833,
+    "max_abs_action": 0.9957523345947266
+  },
+  "antwind/default_ind_2.npz": {
+    "sha256": "272d311757e589bcee54dabe65c878a13e823e435fc85067f833f588e0a68f19",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 0,
+    "mean_episode_reward": 1336.7214260155033,
+    "max_abs_action": 0.9987316131591797
+  },
+  "antwind/default_ind_3.npz": {
+    "sha256": "873d03cb5d0e32ba3d24ab4833be47fc3cbae31f21dcdae6df47252710934e69",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 5,
+    "mean_episode_reward": 1170.73371755902,
+    "max_abs_action": 0.9983896613121033
+  },
+  "antwind/default_ind_4.npz": {
+    "sha256": "68749b518da2380ad9fbab671bc4ca94713b1cebaf1d3094319b63823479234b",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 0,
+    "mean_episode_reward": 1064.6168179937006,
+    "max_abs_action": 0.9985455870628357
+  },
+  "antwind/default_ind_5.npz": {
+    "sha256": "9ab986cc8ae4969ef201ed939e866451f9cc87ac1d13a591a79085cf0cd10690",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 27,
+    "mean_episode_reward": 751.7572658566102,
+    "max_abs_action": 0.9998307228088379
+  },
+  "antwind/default_ind_6.npz": {
+    "sha256": "fc3f0865dc07cd58995315c0cf2a3631134dab4135ea74eafeb08bc19d78d33b",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 7,
+    "mean_episode_reward": 654.046536680387,
+    "max_abs_action": 0.9935073852539062
+  },
+  "antwind/default_ind_7.npz": {
+    "sha256": "ceb7281b8374cbc7b369ee09606f58c59dc490be23f68f8c603f5c9fbddf7fd6",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 9,
+    "mean_episode_reward": 424.4909744070553,
+    "max_abs_action": 0.9910546541213989
+  },
+  "antwind/default_ind_8.npz": {
+    "sha256": "48cc0ab86cd11f43843b545df11ceb6fc65281e3e0fadcce9e5612cff92d310b",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 9,
+    "mean_episode_reward": 399.36574980721065,
+    "max_abs_action": 0.9913844466209412
+  },
+  "antwind/default_ind_9.npz": {
+    "sha256": "b518108aaf6f11f0a60686f549edb016bf9e0d0fe0f1e806bd4f825c9b062bdd",
+    "shape": [
+      200,
+      256,
+      105
+    ],
+    "episode_discontinuities": 0,
+    "mean_episode_reward": 344.33347915048876,
+    "max_abs_action": 0.9951338768005371
+  }
+}

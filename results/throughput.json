@@ -1,0 +1,44 @@
+{
+  "provenance": {
+    "git_commit": "6ebf5ed5df280287951e0a043380f5b5f02b957c",
+    "source_sha256": "25abca5998520284273494227e9361f41abb70a7dfb612087939b36403360b9e",
+    "git_dirty": true,
+    "python": "3.12.3",
+    "jax": "0.11.2",
+    "devices": [
+      "cuda:0: NVIDIA GeForce RTX 3090 Ti"
+    ],
+    "uv_lock_sha256": "99581ef772086558aa62d476a50064eb78c15a952cafb598daa71b98996ac06f"
+  },
+  "results": [
+    {
+      "run": "runs/fig5/bfb/num_train_layouts30_context_len100_seed0",
+      "batch_size": 1024,
+      "updates_per_repeat": 1000,
+      "seconds": [
+        3.3293053670204245,
+        3.3286803000373766,
+        3.3298685969784856
+      ],
+      "median_updates_per_second": 300.36295555999243,
+      "median_transitions_per_second": 307571.66649343225,
+      "fb_parameters": 6496900,
+      "encoder_parameters": 528233
+    },
+    {
+      "run": "runs/compact_grid/bfb/seed0",
+      "batch_size": 256,
+      "updates_per_repeat": 1000,
+      "seconds": [
+        0.46299447800265625,
+        0.46121103601763025,
+        0.46275981795042753
+      ],
+      "median_updates_per_second": 2160.9482094383648,
+      "median_transitions_per_second": 553202.7416162214,
+      "fb_parameters": 402720,
+      "encoder_parameters": 93441
+    }
+  ],
+  "scope": "training updates only; different presets have different batch sizes and quality"
+}

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
 
 import flax.linen as nn
 import jax
@@ -12,8 +12,10 @@ import jax.numpy as jnp
 def encode_obs(obs, encoding: str, grid_size: int = 11):
     """Input features of a normalised grid position: ``xy`` (the 2 coordinates) or ``onehot`` (one-hot row and
     column, 2 * grid_size features), which gives the networks cell-level resolution."""
-    if encoding == 'xy':
+    if encoding == "xy":
         return obs
+    if encoding != "onehot":
+        raise ValueError(f"unknown observation encoding: {encoding}")
     idx = jnp.round(obs * (grid_size - 1)).astype(jnp.int32)
     return jnp.concatenate([jax.nn.one_hot(idx[..., 0], grid_size), jax.nn.one_hot(idx[..., 1], grid_size)], -1)
 
@@ -66,8 +68,8 @@ class ForwardDiscrete(nn.Module):
             x = jnp.concatenate([obs, task], -1)
         ensemble = nn.vmap(
             MLP,
-            variable_axes={'params': 0},
-            split_rngs={'params': True},
+            variable_axes={"params": 0},
+            split_rngs={"params": True},
             in_axes=None,
             out_axes=0,
             axis_size=2,
@@ -112,10 +114,12 @@ class DynamicsEncoder(nn.Module):
     num_layers: int = 4
     num_heads: int = 4
     mlp_dim: int = 256
+    delta_scale: float | None = None
 
     @nn.compact
     def __call__(self, obs, actions_onehot, next_obs):
-        x = jnp.concatenate([obs, actions_onehot, next_obs], -1)
+        outcome = next_obs if self.delta_scale is None else (next_obs - obs) / self.delta_scale
+        x = jnp.concatenate([obs, actions_onehot, outcome], -1)
         x = nn.Dense(self.emb_dim)(x)
         for _ in range(self.num_layers):
             x = EncoderBlock(self.num_heads, self.mlp_dim)(x)
