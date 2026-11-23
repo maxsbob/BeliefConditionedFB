@@ -52,11 +52,6 @@ The arrow shows wind in world x/y coordinates; returns are cumulative for the di
 - [Dataset audit](results/data_audit.json)
 - [Evidence format and regeneration](results/README.md)
 
-The main findings are that inference settings strongly affect Four-Rooms success, unseen action remapping breaks
-unmodified agents, and adaptation to unseen continuous dynamics is substantially harder than interpolation.
-Observation-only action calibration and collision memory improve grid transfer. A fitted affine action adapter
-helps on continuous rotation shifts but is explicitly restricted to the corresponding dynamics family.
-
 ## Install
 
 Python 3.10–3.12 and [uv](https://docs.astral.sh/uv/) are required. Experiments use JAX/CUDA 12; two RTX 3090 Ti GPUs
@@ -93,12 +88,6 @@ uv run --extra mujoco scripts/train_continuous.py --config-name antwind agent=bf
 uv run --extra mujoco scripts/run_suite.py --suite antwind --gpus 0 1 \
   --root runs/antwind_bc agent.bc_coef=1.0
 ```
-
-Training writes resolved configs, provenance, losses, inference checkpoints, and `final.json`. Finalized runs are
-protected from accidental overwrites. `run_suite.py` skips completed runs, uses process-safe locks, records commands,
-and exits unsuccessfully if a child fails. Continuous training resumes interrupted runs from `training_state.pkl`
-(including optimizer and target networks); an inference-only `checkpoint.pkl` is not a training resume file.
-Use a different `out_dir`/`--root` when changing settings. `--dry-run` previews suite commands.
 
 ## Evaluate
 
@@ -147,9 +136,6 @@ Existing evaluation files are protected from overwrites: select another output d
 | `scripts/benchmark_*`, `scripts/summarize_results.py` | Evaluation and evidence aggregation |
 | `tests/` | Numerical, environment, protocol, and checkpoint regression tests |
 | `docs/`, `results/` | Methods, limitations, measured evidence |
-
-The original release remains available at Git tag `v1.0-paper-original`. Legacy plotting and Fig. 5 sweep scripts
-are retained, but the current evidence is produced by the benchmark and summary scripts above.
 
 ## Citation
 
